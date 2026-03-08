@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabase"
 
+export const dynamic = 'force-dynamic'
+
 export default function Dashboard() {
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
