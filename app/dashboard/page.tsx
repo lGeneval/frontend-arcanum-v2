@@ -14,19 +14,42 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    loadData()
+    initAuth()
   }, [])
 
-  async function loadData() {
-    const { data: { session } } = await supabase.auth.getSession()
+  async function initAuth() {
+    // ✅ ИСПРАВЛЕНИЕ: Именно это уберет бесконечный редирект
+    // Сначала проверяем localStorage, потом уже Supabase
 
-    if (!session) {
-      router.replace("/login")
+    const localUser = localStorage.getItem('arcanum_user')
+
+    if (localUser) {
+      const user = JSON.parse(localUser)
+
+      // Пробуем загрузить реальные данные из Supabase
+      const { data: { session } } = await supabase.auth.getSession()
+
+      if (session) {
+        await loadFromDB(session.user.id)
+      } else {
+        // Тестовый режим
+        setProfile({
+          telegram_first_name: user.first_name,
+          telegram_username: user.username,
+          telegram_id: user.id,
+          balance: 0
+        })
+      }
+
+      setLoading(false)
       return
     }
 
-    const userId = session.user.id
+    // Если вообще ничего нет — на логин
+    router.replace("/login")
+  }
 
+  async function loadFromDB(userId: string) {
     const [profileRes, subsRes, keysRes] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", userId).single(),
       supabase.from("subscriptions").select("*").eq("user_id", userId),
@@ -36,12 +59,11 @@ export default function Dashboard() {
     if (profileRes.data) setProfile(profileRes.data)
     if (subsRes.data) setSubs(subsRes.data)
     if (keysRes.data) setKeys(keysRes.data)
-
-    setLoading(false)
   }
 
   async function handleLogout() {
     await supabase.auth.signOut()
+    localStorage.removeItem('arcanum_user')
     router.replace("/login")
   }
 
@@ -55,7 +77,7 @@ export default function Dashboard() {
         background: "#0a0a0a",
         color: "white"
       }}>
-        <p>Загрузка...</p>
+        <div className="w-8 h-8 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     )
   }

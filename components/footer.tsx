@@ -5,23 +5,27 @@ import { Apple, Monitor, Smartphone, Tv, Chrome, Terminal, Send, Mail, MessageCi
 import { AnimatedLogo } from "./animated-logo";
 
 const platforms = [
-  { name: "iOS", icon: Apple, href: "#" },
-  { name: "Android", icon: Smartphone, href: "#" },
-  { name: "Windows", icon: Monitor, href: "#" },
-  { name: "macOS", icon: Apple, href: "#" },
-  { name: "Android TV", icon: Tv, href: "#" },
-  { name: "Browser", icon: Chrome, href: "#" },
-  { name: "Linux", icon: Terminal, href: "#" },
+  { name: "iOS", icon: Apple, href: "#download" },
+  { name: "Android", icon: Smartphone, href: "#download" },
+  { name: "Windows", icon: Monitor, href: "#download" },
+  { name: "macOS", icon: Apple, href: "#download" },
+  { name: "Android TV", icon: Tv, href: "#download" },
+  { name: "Browser", icon: Chrome, href: "#download" },
+  { name: "Linux", icon: Terminal, href: "#download" },
 ];
 
 const aboutLinks = [
-  { name: "О компании", href: "#" },
+  { name: "О компании", href: "#about" },
   { name: "Пользовательское соглашение", href: "#" },
   { name: "Политика конфиденциальности", href: "#" },
   { name: "Политика возврата", href: "#" },
 ];
 
 export function Footer() {
+  const scrollTo = (id: string) => {
+    document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <footer className="relative pt-20 pb-8 border-t border-purple-500/20 overflow-hidden">
       {/* Background glow */}
@@ -42,7 +46,9 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-3">
               <a 
-                href="#" 
+                href="https://t.me/arcanumvpnbot"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-xl bg-secondary border border-purple-500/20 flex items-center justify-center hover:border-purple-400/50 hover:bg-purple-500/10 transition-all duration-300 hover:scale-110"
               >
                 <Send className="w-5 h-5 text-muted-foreground" />
@@ -58,13 +64,13 @@ export function Footer() {
             <ul className="space-y-3">
               {platforms.map((platform) => (
                 <li key={platform.name}>
-                  <a 
-                    href={platform.href}
+                  <button 
+                    onClick={() => scrollTo('#download')}
                     className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
                   >
                     <platform.icon className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
                     <span className="text-sm">{platform.name}</span>
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -78,12 +84,16 @@ export function Footer() {
             <ul className="space-y-3">
               {aboutLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
-                    href={link.href}
+                  <button 
+                    onClick={() => {
+                      if (link.href !== '#') {
+                        scrollTo(link.href);
+                      }
+                    }}
                     className="text-sm text-muted-foreground hover:text-foreground hover:text-purple-300 transition-colors"
                   >
                     {link.name}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -111,7 +121,9 @@ export function Footer() {
               </li>
               <li>
                 <a 
-                  href="#"
+                  href="https://t.me/arcanumvpnbot"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors group"
                 >
                   <div className="w-8 h-8 rounded-lg bg-secondary border border-purple-500/20 flex items-center justify-center group-hover:border-purple-400/50 transition-colors">

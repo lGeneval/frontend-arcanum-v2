@@ -1,9 +1,10 @@
 "use client";
-
+ 
 import { useEffect, useState, useRef } from "react";
 import { Apple, Monitor, Smartphone, Tv, Chrome, Terminal, ArrowRight, Sparkles } from "lucide-react";
 import { MagicButton } from "./magic-button";
-
+import Link from "next/link";
+ 
 const platforms = [
   { name: "iOS", icon: Apple },
   { name: "Android", icon: Smartphone },
@@ -13,7 +14,7 @@ const platforms = [
   { name: "Browser", icon: Chrome },
   { name: "Linux", icon: Terminal },
 ];
-
+ 
 interface MagicParticle {
   id: number;
   left: number;
@@ -23,11 +24,11 @@ interface MagicParticle {
   delay: number;
   hue: number;
 }
-
+ 
 export function HeroSection() {
   const [particles, setParticles] = useState<MagicParticle[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
-
+ 
   useEffect(() => {
     const newParticles: MagicParticle[] = Array.from({ length: 40 }, (_, i) => ({
       id: i,
@@ -40,7 +41,7 @@ export function HeroSection() {
     }));
     setParticles(newParticles);
   }, []);
-
+ 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Video background with blur */}
@@ -61,14 +62,14 @@ export function HeroSection() {
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background" />
       </div>
-
+ 
       {/* Animated background overlay */}
       <div className="absolute inset-0 -z-10">
         {/* Mystical ambient glow */}
         <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[100px] animate-pulse-glow" />
         <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-pink-600/8 rounded-full blur-[80px]" style={{ animation: "pulse-glow 4s ease-in-out infinite", animationDelay: "1s" }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-purple-900/5 to-transparent rounded-full" />
-        
+ 
         {/* Mystical particles */}
         {particles.map((particle) => (
           <div
@@ -86,7 +87,7 @@ export function HeroSection() {
             }}
           />
         ))}
-        
+ 
         {/* Subtle grid */}
         <div 
           className="absolute inset-0 opacity-[0.02]"
@@ -96,7 +97,7 @@ export function HeroSection() {
           }}
         />
       </div>
-
+ 
       <div className="container mx-auto px-4 text-center relative z-10">
         <div className="animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-8 backdrop-blur-sm hover:bg-purple-500/20 hover:border-purple-400/40 transition-all duration-300 cursor-default">
@@ -104,7 +105,7 @@ export function HeroSection() {
             <span className="text-sm text-purple-300">Твоя приватность под защитой</span>
           </div>
         </div>
-
+ 
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 animate-fade-in-up" style={{ animationDelay: "0.1s", fontFamily: "serif" }}>
           <span className="text-foreground drop-shadow-[0_0_30px_rgba(139,92,246,0.3)]">Защитите</span>
           <br />
@@ -112,28 +113,33 @@ export function HeroSection() {
             тайное
           </span>
         </h1>
-
+ 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 animate-fade-in-up leading-relaxed" style={{ animationDelay: "0.2s" }}>
           Интернет без границ и слежки. Один аккаунт — защита для всех ваших устройств.
         </p>
-
+ 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
-          <MagicButton 
-            size="lg" 
-            className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 text-lg px-8 py-6 border border-purple-400/30"
-          >
-            Начать бесплатно
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </MagicButton>
+          <Link href="/login">
+            <MagicButton 
+              size="lg" 
+              className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 text-lg px-8 py-6 border border-purple-400/30"
+            >
+              Начать бесплатно
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </MagicButton>
+          </Link>
           <MagicButton 
             size="lg" 
             variant="outline" 
             className="border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-400/50 text-lg px-8 py-6"
+            onClick={() => {
+              document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+            }}
           >
             Узнать больше
           </MagicButton>
         </div>
-
+ 
         <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           <p className="text-sm text-muted-foreground mb-6">Доступно на всех платформах</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
@@ -143,7 +149,7 @@ export function HeroSection() {
           </div>
         </div>
       </div>
-
+ 
       <style jsx>{`
         @keyframes mystical-float {
           0%, 100% {
@@ -163,17 +169,17 @@ export function HeroSection() {
     </section>
   );
 }
-
+ 
 function PlatformButton({ platform, index }: { platform: { name: string; icon: React.ElementType }; index: number }) {
   const [isHovered, setIsHovered] = useState(false);
   const [sparkles, setSparkles] = useState<{ id: number; x: number; y: number }[]>([]);
-
+ 
   useEffect(() => {
     if (!isHovered) {
       setSparkles([]);
       return;
     }
-
+ 
     const interval = setInterval(() => {
       setSparkles(prev => {
         const newSparkle = {
@@ -184,12 +190,15 @@ function PlatformButton({ platform, index }: { platform: { name: string; icon: R
         return [...prev.slice(-8), newSparkle];
       });
     }, 100);
-
+ 
     return () => clearInterval(interval);
   }, [isHovered]);
-
+ 
   return (
     <button
+      onClick={() => {
+        document.querySelector('#download')?.scrollIntoView({ behavior: 'smooth' });
+      }}
       className="group relative flex items-center gap-2 px-5 py-3 rounded-xl bg-secondary/50 border border-border hover:border-purple-500/50 hover:bg-purple-500/10 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20 backdrop-blur-sm overflow-hidden"
       style={{ animationDelay: `${index * 0.1}s` }}
       onMouseEnter={() => setIsHovered(true)}
@@ -206,7 +215,7 @@ function PlatformButton({ platform, index }: { platform: { name: string; icon: R
           }}
         />
       ))}
-      
+ 
       <platform.icon className="w-5 h-5 text-muted-foreground group-hover:text-purple-400 transition-colors relative z-10" />
       <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors relative z-10">
         {platform.name}

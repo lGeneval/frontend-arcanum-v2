@@ -18,6 +18,10 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const scrollTo = (id: string) => {
+    document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -35,27 +39,27 @@ export function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          <Link
-            href="#download"
+          <button
+            onClick={() => scrollTo('#download')}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 relative group"
           >
             Скачать
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300" />
-          </Link>
-          <Link
-            href="#about"
+          </button>
+          <button
+            onClick={() => scrollTo('#about')}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 relative group"
           >
             О нас
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300" />
-          </Link>
-          <Link
-            href="#support"
+          </button>
+          <button
+            onClick={() => scrollTo('#support')}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-300 relative group"
           >
             Помощь и поддержка
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300" />
-          </Link>
+          </button>
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -64,9 +68,11 @@ export function Header() {
             RU
             <ChevronDown className="w-3 h-3" />
           </button>
-          <Button className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30 border border-purple-400/20">
-            Войти
-          </Button>
+          <Link href="/login">
+            <Button className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30 border border-purple-400/20">
+              Войти
+            </Button>
+          </Link>
         </div>
 
         <button
@@ -83,18 +89,20 @@ export function Header() {
         }`}
       >
         <div className="container mx-auto px-4 py-6 flex flex-col gap-4">
-          <Link href="#download" className="text-foreground py-2 hover:text-purple-400 transition-colors">
+          <button onClick={() => { scrollTo('#download'); setIsMobileMenuOpen(false); }} className="text-left text-foreground py-2 hover:text-purple-400 transition-colors">
             Скачать
-          </Link>
-          <Link href="#about" className="text-foreground py-2 hover:text-purple-400 transition-colors">
+          </button>
+          <button onClick={() => { scrollTo('#about'); setIsMobileMenuOpen(false); }} className="text-left text-foreground py-2 hover:text-purple-400 transition-colors">
             О нас
-          </Link>
-          <Link href="#support" className="text-foreground py-2 hover:text-purple-400 transition-colors">
+          </button>
+          <button onClick={() => { scrollTo('#support'); setIsMobileMenuOpen(false); }} className="text-left text-foreground py-2 hover:text-purple-400 transition-colors">
             Помощь и поддержка
+          </button>
+          <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+            <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 mt-4">
+              Войти
+            </Button>
           </Link>
-          <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 mt-4">
-            Войти
-          </Button>
         </div>
       </div>
     </header>

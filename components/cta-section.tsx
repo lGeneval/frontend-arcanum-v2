@@ -2,6 +2,7 @@
 
 import { Shield, CreditCard, ArrowRight, Check, Sparkles } from "lucide-react";
 import { MagicButton } from "./magic-button";
+import Link from "next/link";
 
 export function CTASection() {
   return (
@@ -47,13 +48,15 @@ export function CTASection() {
                   ))}
                 </ul>
 
-                <MagicButton 
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 border border-purple-400/30"
-                >
-                  Подключить семью
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </MagicButton>
+                <Link href="/login">
+                  <MagicButton 
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 border border-purple-400/30"
+                  >
+                    Подключить семью
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </MagicButton>
+                </Link>
               </div>
             </div>
           </div>
@@ -89,14 +92,16 @@ export function CTASection() {
                   </p>
                 </div>
 
-                <MagicButton 
-                  size="lg"
-                  variant="outline"
-                  className="w-full border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-400/50"
-                >
-                  Попробовать бесплатно
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </MagicButton>
+                <Link href="/login">
+                  <MagicButton 
+                    size="lg"
+                    variant="outline"
+                    className="w-full border-purple-500/30 hover:bg-purple-500/10 hover:border-purple-400/50"
+                  >
+                    Попробовать бесплатно
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </MagicButton>
+                </Link>
               </div>
             </div>
           </div>

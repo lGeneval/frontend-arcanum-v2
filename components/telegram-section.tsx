@@ -5,7 +5,7 @@ import { Send, Sparkles } from "lucide-react";
 
 export function TelegramSection() {
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section id="support" className="py-20 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="relative rounded-3xl bg-gradient-to-br from-purple-500/20 via-secondary to-pink-500/20 p-1 group hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
           <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 opacity-30 blur-xl group-hover:opacity-50 transition-opacity" />
@@ -31,13 +31,15 @@ export function TelegramSection() {
                 </div>
               </div>
               
-              <Button 
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 whitespace-nowrap border border-purple-400/30"
-              >
-                <Send className="w-5 h-5 mr-2" />
-                Открыть Telegram
-              </Button>
+              <a href="https://t.me/arcanumvpnbot" target="_blank" rel="noopener noreferrer">
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/30 whitespace-nowrap border border-purple-400/30"
+                >
+                  <Send className="w-5 h-5 mr-2" />
+                  Открыть Telegram
+                </Button>
+              </a>
             </div>
           </div>
         </div>

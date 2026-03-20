@@ -7,24 +7,12 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Arkanum VPN – Защитите тайное',
-  description: 'Защитите тайное. Интернет без границ и слежки. Один аккаунт — защита для всех ваших устройств.',
+  title: 'Arcanum - Официальный сайт',
+  description: 'Интернет без границ и слежки. Один аккаунт — защита для всех ваших устройств.',
   generator: 'v0.app',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
+    icon: '/icon.png',
+    shortcut: '/favicon.ico',
     apple: '/apple-icon.png',
   },
 }
