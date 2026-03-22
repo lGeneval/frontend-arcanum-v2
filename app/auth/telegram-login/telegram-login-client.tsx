@@ -8,37 +8,42 @@ export default function TelegramLoginClient() {
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    async function run() {
+    async function autoLogin() {
       const token = searchParams.get("token")
+
       if (!token) {
         router.replace("/login?error=no_token")
         return
       }
 
       try {
-        const res = await fetch(`/api/auth/telegram/consume?token=${encodeURIComponent(token)}`)
-        const json = await res.json()
+        // 🔥 ОБРАЩАЕМСЯ К НАШЕМУ НОВОМУ API 🔥
+        const res = await fetch(`/api/auth/telegram/consume?token=${token}`)
+        const data = await res.json()
 
-        if (!json.success) {
-          router.replace(`/login?error=${json.error || "auth_failed"}`)
-          return
+        if (!res.ok) {
+          throw new Error(data.error || "Auth failed")
         }
 
-        localStorage.setItem("arcanum_user", JSON.stringify(json.user))
+        // Сохраняем в localStorage
+        localStorage.setItem("arcanum_user", JSON.stringify(data.user))
+
+        // Редирект в dashboard
         router.replace("/dashboard")
-      } catch (e) {
-        router.replace("/login?error=exception")
+      } catch (error: any) {
+        console.error("Auto-login error:", error)
+        router.replace(`/login?error=${error.message}`)
       }
     }
 
-    run()
+    autoLogin()
   }, [router, searchParams])
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
         <div className="w-12 h-12 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-muted-foreground">Авторизация через Telegram...</p>
+        <p className="text-muted-foreground">Авторизация...</p>
       </div>
     </main>
   )
