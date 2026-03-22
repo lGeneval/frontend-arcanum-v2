@@ -582,72 +582,72 @@ export default function Dashboard() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {PLANS.map((plan, index) => (
-                <div
-                  key={plan.id}
-                  className={`group relative rounded-2xl bg-card border p-7 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 overflow-hidden flex flex-col ${
-                    plan.popular
-                      ? "border-purple-500/40 shadow-lg shadow-purple-500/10"
-                      : "border-purple-500/10"
-                  }`}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${plan.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-                  <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
+  <div
+    key={plan.id}
+    className={`group relative rounded-2xl bg-card border p-7 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 flex flex-col ${
+      plan.popular
+        ? "border-purple-500/40 shadow-lg shadow-purple-500/10 mt-4"
+        : "border-purple-500/10"
+    }`}
+    style={{ animationDelay: `${index * 0.1}s` }}
+  >
+    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${plan.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+    <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
 
-                  {/* Бейдж Популярный — фиксированная позиция */}
-                  {plan.popular && (
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-lg shadow-purple-500/30 whitespace-nowrap z-10">
-                      ⭐ Популярный
-                    </div>
-                  )}
+    {/* Бейдж Популярный — теперь внутри карточки */}
+    {plan.popular && (
+      <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-lg shadow-purple-500/30 whitespace-nowrap z-20">
+        ⭐ Популярный
+      </div>
+    )}
 
-                  <div className={`relative z-10 flex flex-col flex-1 ${plan.popular ? "pt-4" : ""}`}>
-                    {/* Иконка */}
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg`}>
-                      <CreditCard className="w-7 h-7 text-white" />
-                    </div>
+    <div className="relative z-10 flex flex-col flex-1">
+      {/* Иконка */}
+      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg`}>
+        <CreditCard className="w-7 h-7 text-white" />
+      </div>
 
-                    <h3 className="text-2xl font-bold mb-1 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>
-                      {plan.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
+      <h3 className="text-2xl font-bold mb-1 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>
+        {plan.name}
+      </h3>
+      <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
 
-                    {/* Цена */}
-                    <div className="mb-4">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-bold" style={{ fontFamily: "serif" }}>{plan.pricePerMonth}</span>
-                        <span className="text-muted-foreground">₽/мес</span>
-                      </div>
-                      <p className="text-sm text-purple-400 mt-1">
-                        ≈ {plan.pricePerDay.toFixed(0)} ₽/день
-                      </p>
-                    </div>
+      {/* Цена */}
+      <div className="mb-4">
+        <div className="flex items-baseline gap-1">
+          <span className="text-4xl font-bold" style={{ fontFamily: "serif" }}>{plan.pricePerMonth}</span>
+          <span className="text-muted-foreground">₽/мес</span>
+        </div>
+        <p className="text-sm text-purple-400 mt-1">
+          ≈ {plan.pricePerDay.toFixed(0)} ₽/день
+        </p>
+      </div>
 
-                    {/* Фичи */}
-                    <div className="flex-1 space-y-2 mb-6">
-                      {plan.features.map((f) => (
-                        <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
-                          {f}
-                        </div>
-                      ))}
-                    </div>
+      {/* Фичи */}
+      <div className="flex-1 space-y-2 mb-6">
+        {plan.features.map((f) => (
+          <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+            {f}
+          </div>
+        ))}
+      </div>
 
-                    {/* Кнопка */}
-                    <MagicButton
-                      className={`w-full ${
-                        plan.popular
-                          ? "bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 border border-purple-400/30"
-                          : "border-purple-500/30 hover:bg-purple-500/10"
-                      }`}
-                      variant={plan.popular ? "default" : "outline"}
-                      onClick={() => handleSelectPlan(plan)}
-                    >
-                      Выбрать
-                    </MagicButton>
-                  </div>
-                </div>
-              ))}
+      {/* Кнопка */}
+      <MagicButton
+        className={`w-full ${
+          plan.popular
+            ? "bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 border border-purple-400/30"
+            : "border-purple-500/30 hover:bg-purple-500/10"
+        }`}
+        variant={plan.popular ? "default" : "outline"}
+        onClick={() => handleSelectPlan(plan)}
+      >
+        Выбрать
+      </MagicButton>
+    </div>
+  </div>
+))}
             </div>
 
             {/* Баланс */}
