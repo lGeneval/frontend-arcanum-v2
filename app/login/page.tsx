@@ -206,16 +206,16 @@ export default function LoginPage() {
   }, [isTelegramHovered])
 
   const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback/google`,
-      },
-    })
-    if (error) {
-      alert("Ошибка входа: " + error.message)
-    }
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  })
+  if (error) {
+    alert("Ошибка входа: " + error.message)
   }
+}
 
   if (isLoading) {
     return (
