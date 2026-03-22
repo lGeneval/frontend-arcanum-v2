@@ -28,7 +28,7 @@ export default function LoginPage() {
   const [isTelegramHovered, setIsTelegramHovered] = useState(false)
 
   const googleRef = useRef<HTMLButtonElement>(null)
-  const telegramRef = useRef<HTMLAnchorElement>(null)
+  const telegramRef = useRef<HTMLButtonElement>(null)
   const googleAnimRef = useRef<number | null>(null)
   const telegramAnimRef = useRef<number | null>(null)
 
@@ -206,20 +206,54 @@ export default function LoginPage() {
   }, [isTelegramHovered])
 
   const handleGoogleLogin = async () => {
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
-      queryParams: {
-        access_type: 'offline',
-        prompt: 'consent',
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
-    },
-  })
-  if (error) {
-    alert("Ошибка входа: " + error.message)
+    })
+    if (error) {
+      alert("Ошибка входа: " + error.message)
+    }
   }
-}
+
+  const handleTelegramLogin = () => {
+    // @ts-ignore
+    if (window.Telegram?.Login) {
+      // @ts-ignore
+      window.Telegram.Login.auth(
+        { bot_id: "8654056534", request_access: true },
+        async (data: any) => {
+          if (!data) {
+            alert("Ошибка авторизации Telegram")
+            return
+          }
+
+          try {
+            const response = await fetch("/api/auth/telegram", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data),
+            })
+
+            const result = await response.json()
+
+            if (result.success) {
+              localStorage.setItem("arcanum_user", JSON.stringify(result.user))
+              router.push("/dashboard")
+            } else {
+              alert("Ошибка: " + result.error)
+            }
+          } catch (error) {
+            alert("Ошибка подключения к серверу")
+          }
+        }
+      )
+    } else {
+      // Fallback — открываем бота
+      window.open("https://t.me/arcanumvpnbot?start=login", "_blank")
+    }
+  }
 
   if (isLoading) {
     return (
@@ -262,6 +296,7 @@ export default function LoginPage() {
             </p>
 
             <div className="space-y-4">
+
               {/* Google */}
               <div className="relative">
                 <button
@@ -324,11 +359,9 @@ export default function LoginPage() {
 
               {/* Telegram */}
               <div className="relative">
-                <a
+                <button
                   ref={telegramRef}
-                  href="https://t.me/arcanumvpnbot?start=login"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={handleTelegramLogin}
                   onMouseEnter={() => setIsTelegramHovered(true)}
                   onMouseLeave={() => setIsTelegramHovered(false)}
                   className={`w-full flex items-center justify-center gap-3 py-4 px-6 rounded-xl border border-purple-500/20 bg-card/50 transition-all duration-300 text-muted-foreground hover:text-foreground hover:bg-purple-500/10 hover:border-purple-500/40 ${
@@ -345,7 +378,7 @@ export default function LoginPage() {
                     <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
                   </svg>
                   <span className="font-medium">Войти через Telegram</span>
-                </a>
+                </button>
 
                 <div className="absolute inset-0 pointer-events-none overflow-visible">
                   {telegramParticles.map((p) => (
@@ -365,11 +398,13 @@ export default function LoginPage() {
                   ))}
                 </div>
               </div>
+
             </div>
 
             <p className="text-center text-muted-foreground/50 text-xs leading-relaxed mt-10">
               Мы не получаем доступ к вашим сообщениям и контактам
             </p>
+
           </div>
         </div>
       </div>
