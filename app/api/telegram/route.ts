@@ -31,10 +31,6 @@ export async function POST(request: NextRequest) {
       const chatId = callbackQuery.message.chat.id
       const data = callbackQuery.data
 
-      if (data === 'open_dashboard') {
-        await sendMessage(chatId, `🏠 Откройте личный кабинет:\n\n${WEBSITE_URL}/login?source=telegram`)
-      }
-
       if (data === 'invite') {
         // TODO: Получить реферальный код пользователя из БД
         const refCode = 'DEMO123' // Заглушка
@@ -79,7 +75,7 @@ async function sendWelcomeMessage(chatId: number) {
       [
         {
           text: '🏠 Личный кабинет',
-          callback_data: 'open_dashboard',
+          url: `${WEBSITE_URL}/login?source=telegram`,
         },
       ],
       [
@@ -118,7 +114,7 @@ async function sendHelpMessage(chatId: number) {
       [
         {
           text: '🏠 Личный кабинет',
-          callback_data: 'open_dashboard',
+          url: `${WEBSITE_URL}/login?source=telegram`,
         },
       ],
     ],
