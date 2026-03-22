@@ -64,34 +64,91 @@ export async function POST(request: NextRequest) {
 
 // Отправка приветственного сообщения
 async function sendWelcomeMessage(chatId: number) {
-  const text = `👋 <b>Добро пожаловать в Arcanum VPN!</b>
+  try {
+    // Получаем информацию о пользователе
+    const userInfo = await fetch(`${TELEGRAM_API}/getChat?chat_id=${chatId}`)
+    const userData = await userInfo.json()
+    
+    const telegramUser = userData.result
+    const first_name = telegramUser.first_name || 'Пользователь'
+    const username = telegramUser.username || ''
+    const photo_url = '' // Можно получить через getUserProfilePhotos
+
+    // Генерируем ссылку для авторизации
+    const loginLinkResponse = await fetch(`${WEBSITE_URL}/api/bot/generate-login-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        telegram_id: chatId,
+        first_name,
+        username,
+        photo_url,
+      }),
+    })
+
+    const loginData = await loginLinkResponse.json()
+    const login_url = loginData.login_url || `${WEBSITE_URL}/login?source=telegram`
+
+    const text = `👋 <b>Добро пожаловать в Arcanum VPN!</b>
 
 🔐 Надёжная защита вашего интернета
 
 Управляйте подпиской через личный кабинет 👇`
 
-  const keyboard = {
-    inline_keyboard: [
-      [
-        {
-          text: '🏠 Личный кабинет',
-          url: `${WEBSITE_URL}/login?source=telegram`,
-        },
+    const keyboard = {
+      inline_keyboard: [
+        [
+          {
+            text: '🏠 Личный кабинет',
+            url: login_url,
+          },
+        ],
+        [
+          {
+            text: '👥 Пригласить',
+            callback_data: 'invite',
+          },
+          {
+            text: '❓ Помощь',
+            callback_data: 'help',
+          },
+        ],
       ],
-      [
-        {
-          text: '👥 Пригласить',
-          callback_data: 'invite',
-        },
-        {
-          text: '❓ Помощь',
-          callback_data: 'help',
-        },
-      ],
-    ],
-  }
+    }
 
-  await sendMessage(chatId, text, { parse_mode: 'HTML', reply_markup: keyboard })
+    await sendMessage(chatId, text, { parse_mode: 'HTML', reply_markup: keyboard })
+  } catch (error) {
+    console.error('Error in sendWelcomeMessage:', error)
+    // Fallback — отправляем без токена
+    const text = `👋 <b>Добро пожаловать в Arcanum VPN!</b>
+
+🔐 Надёжная защита вашего интернета
+
+Управляйте подпиской через личный кабинет 👇`
+
+    const keyboard = {
+      inline_keyboard: [
+        [
+          {
+            text: '🏠 Личный кабинет',
+            url: `${WEBSITE_URL}/login?source=telegram`,
+          },
+        ],
+        [
+          {
+            text: '👥 Пригласить',
+            callback_data: 'invite',
+          },
+          {
+            text: '❓ Помощь',
+            callback_data: 'help',
+          },
+        ],
+      ],
+    }
+
+    await sendMessage(chatId, text, { parse_mode: 'HTML', reply_markup: keyboard })
+  }
 }
 
 // Отправка сообщения помощи
