@@ -42,7 +42,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-              Безопасный VPN для всей семьи. Древняя магия защиты, приватности и свободы в цифровом мире.
+              Безопасный VPN для всей семьи. Интернет без границ и слежки. Один аккаунт — защита для всех ваших устройств.
             </p>
             <div className="flex items-center gap-3">
               <a 
@@ -142,7 +142,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-purple-500/20 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            2024 Arkanum VPN. Все права защищены.
+            2026 Arkanum VPN. Все права защищены.
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-sm text-muted-foreground hover:text-purple-300 transition-colors">
