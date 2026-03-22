@@ -8,6 +8,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token = searchParams.get("token")
 
+  console.log("🟢 [API] Token received:", token)
+
   if (!token) {
     return NextResponse.json({ error: "No token provided" }, { status: 400 })
   }
@@ -16,6 +18,7 @@ export async function GET(request: NextRequest) {
 
   try {
     // 1. Проверяем токен
+    console.log("🟢 [API] Checking token in DB...")
     const { data: tokenData, error: tokenError } = await supabase
       .from("telegram_login_tokens")
       .select("*")
@@ -23,16 +26,26 @@ export async function GET(request: NextRequest) {
       .eq("used", false)
       .single()
 
-    if (tokenError || !tokenData) {
+    if (tokenError) {
+      console.error("🔴 [API] Token Error:", tokenError)
       return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 })
     }
 
+    if (!tokenData) {
+      console.error("🔴 [API] Token not found in DB")
+      return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 })
+    }
+
+    console.log("🟢 [API] Token found:", tokenData)
+
     // 2. Проверяем срок действия
     if (new Date(tokenData.expires_at) < new Date()) {
+      console.error("🔴 [API] Token expired")
       return NextResponse.json({ error: "Token expired" }, { status: 401 })
     }
 
     // 3. Помечаем токен как использованный
+    console.log("🟢 [API] Marking token as used...")
     await supabase
       .from("telegram_login_tokens")
       .update({ used: true })
@@ -44,8 +57,7 @@ export async function GET(request: NextRequest) {
       .upsert(
         {
           telegram_id: String(tokenData.telegram_id),
-          // Если профиль уже есть, обновляем имя (на случай смены)
-          telegram_first_name: "User", // Можно передавать имя из токена, если сохраняем
+          telegram_first_name: "User",
           balance: 0,
         },
         { onConflict: "telegram_id" }
@@ -54,11 +66,12 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (profileError) {
-      console.error("Profile error:", profileError)
+      console.error("🔴 [API] Profile error:", profileError)
       return NextResponse.json({ error: "Database error" }, { status: 500 })
     }
 
-    // 5. Возвращаем данные пользователя
+    console.log("🟢 [API] Profile found/created:", profile)
+
     return NextResponse.json({
       success: true,
       user: {
@@ -71,7 +84,7 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    console.error("Auth error:", error)
+    console.error("💥 [API] Critical error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
