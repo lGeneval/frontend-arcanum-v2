@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { StarrySky } from "@/components/starry-sky"
 import { MagicButton } from "@/components/magic-button"
+import { AnimatedLogo } from "@/components/animated-logo"
 import {
-  Shield, LogOut, Key, CreditCard, Users, Copy, Check,
+  LogOut, Key, CreditCard, Users, Copy, Check,
   Plus, Smartphone, Monitor, Laptop, X, Wallet, Gift,
   Globe, Zap, Sparkles, ChevronRight, Home,
 } from "lucide-react"
@@ -218,24 +220,31 @@ export default function Dashboard() {
       {/* Header */}
       <header className="relative z-20 border-b border-white/[0.06] bg-background/50 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Shield className="w-6 h-6 text-purple-400 animate-magic-glow" />
-            <span className="text-lg font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-gradient"
-              style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
-              Arcanum
+
+          {/* Логотип — кликабельный как на главной */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <AnimatedLogo size={40} />
+            <span
+              className="text-lg font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent tracking-wider"
+              style={{ fontFamily: "serif" }}
+            >
+              Arkanum
             </span>
-          </div>
+          </Link>
 
           {/* Desktop tabs */}
           <nav className="hidden md:flex items-center gap-1">
             {tabs.map((tab) => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                   activeTab === tab.id
                     ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
                     : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]"
                 }`}
-                style={{ fontFamily: "'Georgia', serif" }}>
+                style={{ fontFamily: "serif" }}
+              >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
               </button>
@@ -244,17 +253,19 @@ export default function Dashboard() {
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+              <p className="text-sm font-medium text-foreground" style={{ fontFamily: "serif" }}>
                 {profile?.telegram_first_name || profile?.email?.split("@")[0] || "Пользователь"}
               </p>
               <p className="text-xs text-muted-foreground">
                 {profile?.telegram_username ? `@${profile.telegram_username}` : profile?.email || ""}
               </p>
             </div>
-            <button onClick={handleLogout}
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-muted-foreground hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group"
+            >
               <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
-              <span className="hidden sm:inline text-sm" style={{ fontFamily: "'Georgia', serif" }}>Выйти</span>
+              <span className="hidden sm:inline text-sm" style={{ fontFamily: "serif" }}>Выйти</span>
             </button>
           </div>
         </div>
@@ -269,16 +280,16 @@ export default function Dashboard() {
             <div className="mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 backdrop-blur-sm">
                 <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-                <span className="text-sm text-purple-300" style={{ fontFamily: "'Georgia', serif" }}>Личный кабинет</span>
+                <span className="text-sm text-purple-300" style={{ fontFamily: "serif" }}>Личный кабинет</span>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "'Georgia', 'Times New Roman', serif" }}>
+              <h1 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "serif" }}>
                 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-gradient drop-shadow-[0_0_30px_rgba(167,139,250,0.4)]">
                   Привет, {profile?.telegram_first_name || profile?.email?.split("@")[0] || "Пользователь"}!
                 </span>
               </h1>
             </div>
 
-            {/* Stat Cards — стиль features секции */}
+            {/* Stat Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {STAT_CARDS.map((card) => (
                 <button
@@ -286,22 +297,16 @@ export default function Dashboard() {
                   onClick={() => card.tab ? setActiveTab(card.tab as Tab) : setShowTopUp(true)}
                   className="group relative rounded-2xl bg-card border border-purple-500/10 p-5 text-left hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 overflow-hidden"
                 >
-                  {/* Hover glow — как в features */}
                   <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-
                   <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg`}>
                     <card.icon className="w-5 h-5 text-white" />
                   </div>
-
-                  <p className="text-xl font-bold text-foreground mb-1 group-hover:text-purple-300 transition-colors"
-                    style={{ fontFamily: "'Georgia', serif" }}>
+                  <p className="text-xl font-bold text-foreground mb-1 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>
                     {getStatValue(card.key)}
                   </p>
-                  <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Georgia', serif" }}>
+                  <p className="text-xs text-muted-foreground" style={{ fontFamily: "serif" }}>
                     {card.label} · {getStatSub(card.key, card.sub)}
                   </p>
-
-                  {/* Corner accent — как в features */}
                   <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
                 </button>
               ))}
@@ -311,9 +316,7 @@ export default function Dashboard() {
             <div className="group relative rounded-2xl bg-card border border-purple-500/10 p-6 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 overflow-hidden">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
               <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
-
-              <h3 className="text-lg font-bold mb-6 flex items-center gap-2 group-hover:text-purple-300 transition-colors"
-                style={{ fontFamily: "'Georgia', serif" }}>
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-2 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>
                 <Sparkles className="w-5 h-5 text-purple-400 animate-pulse" />
                 Быстрый старт
               </h3>
@@ -328,7 +331,7 @@ export default function Dashboard() {
                       {item.step}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{item.title}</p>
+                      <p className="text-sm font-semibold text-foreground" style={{ fontFamily: "serif" }}>{item.title}</p>
                       <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
                     </div>
                   </div>
@@ -342,14 +345,11 @@ export default function Dashboard() {
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
                 <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold flex items-center gap-2 group-hover:text-purple-300 transition-colors"
-                    style={{ fontFamily: "'Georgia', serif" }}>
+                  <h3 className="text-lg font-bold flex items-center gap-2 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>
                     <Key className="w-5 h-5 text-blue-400" />
                     Ваши устройства
                   </h3>
-                  <button onClick={() => setActiveTab("keys")}
-                    className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
-                    style={{ fontFamily: "'Georgia', serif" }}>
+                  <button onClick={() => setActiveTab("keys")} className="text-sm text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1">
                     Все <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -359,7 +359,7 @@ export default function Dashboard() {
                       <div className="flex items-center gap-3">
                         {key.device_type === "ios" || key.device_type === "android" ? <Smartphone className="w-4 h-4 text-muted-foreground" /> : key.device_type === "macos" ? <Laptop className="w-4 h-4 text-muted-foreground" /> : <Monitor className="w-4 h-4 text-muted-foreground" />}
                         <div>
-                          <p className="text-sm font-medium" style={{ fontFamily: "'Georgia', serif" }}>{key.key_name}</p>
+                          <p className="text-sm font-medium" style={{ fontFamily: "serif" }}>{key.key_name}</p>
                           <p className="text-xs text-muted-foreground">{key.server_location} · {key.protocol}</p>
                         </div>
                       </div>
@@ -378,7 +378,7 @@ export default function Dashboard() {
         {activeTab === "keys" && (
           <div className="space-y-6 animate-fade-in-up">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl md:text-3xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>
+              <h2 className="text-2xl md:text-3xl font-bold" style={{ fontFamily: "serif" }}>
                 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-gradient drop-shadow-[0_0_30px_rgba(167,139,250,0.4)]">
                   Устройства
                 </span>
@@ -399,7 +399,7 @@ export default function Dashboard() {
               <div className="group relative rounded-2xl bg-card border border-purple-500/10 p-16 text-center hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
                 <Key className="w-16 h-16 text-muted-foreground mx-auto mb-6 opacity-30" />
-                <h3 className="text-xl font-bold mb-3" style={{ fontFamily: "'Georgia', serif" }}>Нет подключённых устройств</h3>
+                <h3 className="text-xl font-bold mb-3" style={{ fontFamily: "serif" }}>Нет подключённых устройств</h3>
                 <p className="text-muted-foreground text-sm mb-8 max-w-xs mx-auto">Добавьте устройство и получите VPN-ключ для подключения</p>
                 <MagicButton
                   className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 border border-purple-400/30"
@@ -412,8 +412,7 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {vpnKeys.map((key) => (
-                  <div key={key.id}
-                    className="group relative rounded-2xl bg-card border border-purple-500/10 p-5 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-1 overflow-hidden">
+                  <div key={key.id} className="group relative rounded-2xl bg-card border border-purple-500/10 p-5 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-1 overflow-hidden">
                     <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
                     <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
                     <div className="flex items-start justify-between mb-4">
@@ -422,7 +421,7 @@ export default function Dashboard() {
                           {key.device_type === "ios" || key.device_type === "android" ? <Smartphone className="w-5 h-5 text-white" /> : key.device_type === "macos" ? <Laptop className="w-5 h-5 text-white" /> : <Monitor className="w-5 h-5 text-white" />}
                         </div>
                         <div>
-                          <p className="font-semibold group-hover:text-purple-300 transition-colors" style={{ fontFamily: "'Georgia', serif" }}>{key.key_name}</p>
+                          <p className="font-semibold group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>{key.key_name}</p>
                           <div className="flex items-center gap-2 mt-1">
                             <Globe className="w-3 h-3 text-muted-foreground" />
                             <span className="text-xs text-muted-foreground">{key.server_location} · {key.protocol}</span>
@@ -438,7 +437,7 @@ export default function Dashboard() {
                       <button
                         onClick={() => copyToClipboard(key.access_url, key.id)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${copiedKey === key.id ? "bg-green-500/20 text-green-400 border border-green-500/20" : "bg-purple-500/20 text-purple-300 border border-purple-500/20 hover:bg-purple-500/30"}`}
-                        style={{ fontFamily: "'Georgia', serif" }}
+                        style={{ fontFamily: "serif" }}
                       >
                         {copiedKey === key.id ? <><Check className="w-4 h-4" />Скопировано</> : <><Copy className="w-4 h-4" />Копировать</>}
                       </button>
@@ -456,9 +455,9 @@ export default function Dashboard() {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 backdrop-blur-sm">
                 <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-                <span className="text-sm text-purple-300" style={{ fontFamily: "'Georgia', serif" }}>Выберите тариф</span>
+                <span className="text-sm text-purple-300" style={{ fontFamily: "serif" }}>Выберите тариф</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>
+              <h2 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "serif" }}>
                 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-gradient drop-shadow-[0_0_30px_rgba(167,139,250,0.4)]">
                   Тарифные планы
                 </span>
@@ -473,36 +472,28 @@ export default function Dashboard() {
                   className={`group relative rounded-2xl bg-card border border-purple-500/10 p-7 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 overflow-hidden flex flex-col ${plan.popular ? "border-purple-500/30 shadow-lg shadow-purple-500/10 scale-[1.02]" : ""}`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  {/* Hover glow */}
                   <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${plan.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-                  {/* Corner accent */}
                   <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
 
                   {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-lg shadow-purple-500/30"
-                      style={{ fontFamily: "'Georgia', serif" }}>
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold shadow-lg shadow-purple-500/30" style={{ fontFamily: "serif" }}>
                       ⭐ Популярный
                     </div>
                   )}
 
                   <div className="relative z-10 flex flex-col flex-1">
-                    {/* Иконка */}
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg`}>
                       <CreditCard className="w-6 h-6 text-white" />
                     </div>
-
-                    <h3 className="text-xl font-bold mb-1 group-hover:text-purple-300 transition-colors"
-                      style={{ fontFamily: "'Georgia', serif" }}>{plan.name}</h3>
+                    <h3 className="text-xl font-bold mb-1 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>{plan.name}</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       {plan.months === 1 ? "1 месяц" : plan.months === 3 ? "3 месяца" : "12 месяцев"}
                     </p>
-
                     <div className="mb-1">
-                      <span className="text-4xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>{plan.price}</span>
+                      <span className="text-4xl font-bold" style={{ fontFamily: "serif" }}>{plan.price}</span>
                       <span className="text-muted-foreground ml-1">₽</span>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{plan.pricePerMonth} ₽/мес</p>
-
                     {plan.discount > 0 && (
                       <span className="inline-block px-3 py-1 rounded-full text-xs bg-green-500/10 text-green-400 border border-green-500/20 mb-4 w-fit">
                         Скидка {plan.discount}%
@@ -518,11 +509,8 @@ export default function Dashboard() {
                           </div>
                         ))}
                       </div>
-
                       <MagicButton
-                        className={`w-full ${plan.popular
-                          ? "bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 border border-purple-400/30"
-                          : "border-purple-500/30 hover:bg-purple-500/10"}`}
+                        className={`w-full ${plan.popular ? "bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-500 hover:via-pink-500 hover:to-purple-600 border border-purple-400/30" : "border-purple-500/30 hover:bg-purple-500/10"}`}
                         variant={plan.popular ? "default" : "outline"}
                         onClick={() => setShowTopUp(true)}
                       >
@@ -539,8 +527,7 @@ export default function Dashboard() {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
               <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-yellow-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
               <div className="text-4xl mb-4">🎁</div>
-              <h3 className="text-2xl font-bold mb-2 group-hover:text-yellow-300 transition-colors"
-                style={{ fontFamily: "'Georgia', serif" }}>15 дней бесплатно</h3>
+              <h3 className="text-2xl font-bold mb-2 group-hover:text-yellow-300 transition-colors" style={{ fontFamily: "serif" }}>15 дней бесплатно</h3>
               <p className="text-muted-foreground text-sm mb-6">Попробуйте Arcanum VPN без оплаты. Без привязки карты.</p>
               <MagicButton variant="outline" className="border-yellow-500/30 hover:bg-yellow-500/10 hover:border-yellow-400/50">
                 Активировать пробный период
@@ -555,9 +542,9 @@ export default function Dashboard() {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4 backdrop-blur-sm">
                 <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-                <span className="text-sm text-purple-300" style={{ fontFamily: "'Georgia', serif" }}>Зарабатывайте вместе</span>
+                <span className="text-sm text-purple-300" style={{ fontFamily: "serif" }}>Зарабатывайте вместе</span>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>
+              <h2 className="text-3xl md:text-4xl font-bold" style={{ fontFamily: "serif" }}>
                 <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-500 bg-clip-text text-transparent animate-gradient drop-shadow-[0_0_30px_rgba(167,139,250,0.4)]">
                   Реферальная программа
                 </span>
@@ -569,18 +556,13 @@ export default function Dashboard() {
             <div className="group relative rounded-2xl bg-card border border-purple-500/10 p-6 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 overflow-hidden">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
               <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
-              <h3 className="text-sm font-medium text-muted-foreground mb-3 group-hover:text-purple-300 transition-colors"
-                style={{ fontFamily: "'Georgia', serif" }}>
-                Ваша реферальная ссылка
-              </h3>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3" style={{ fontFamily: "serif" }}>Ваша реферальная ссылка</h3>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <code className="flex-1 text-sm bg-background/50 rounded-xl px-4 py-3 font-mono text-purple-300 border border-purple-500/10 truncate">
                   https://arcanumnox.net/ref/{profile?.referral_code || "XXXXXXXX"}
                 </code>
                 <MagicButton
-                  className={copiedRef
-                    ? "bg-green-500/20 text-green-400 border border-green-500/20"
-                    : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 border border-purple-400/30"}
+                  className={copiedRef ? "bg-green-500/20 text-green-400 border border-green-500/20" : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 border border-purple-400/30"}
                   onClick={() => copyToClipboard(`https://arcanumnox.net/ref/${profile?.referral_code}`)}
                 >
                   {copiedRef ? <><Check className="w-4 h-4 mr-2" />Скопировано</> : <><Copy className="w-4 h-4 mr-2" />Копировать</>}
@@ -595,16 +577,17 @@ export default function Dashboard() {
                 { icon: Wallet, label: "Заработано", value: "0 ₽", gradient: "from-purple-500 to-pink-600" },
                 { icon: Gift, label: "Бонус", value: "20%", gradient: "from-emerald-500 to-teal-500" },
               ].map((stat, index) => (
-                <div key={stat.label}
+                <div
+                  key={stat.label}
                   className="group relative rounded-2xl bg-card border border-purple-500/10 p-6 text-center hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 hover:-translate-y-2 overflow-hidden"
-                  style={{ animationDelay: `${index * 0.1}s` }}>
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
                   <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${stat.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
                   <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 group-hover:shadow-lg`}>
                     <stat.icon className="w-6 h-6 text-white" />
                   </div>
-                  <p className="text-3xl font-bold mb-1 group-hover:text-purple-300 transition-colors"
-                    style={{ fontFamily: "'Georgia', serif" }}>{stat.value}</p>
+                  <p className="text-3xl font-bold mb-1 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>{stat.value}</p>
                   <p className="text-xs text-muted-foreground">{stat.label}</p>
                 </div>
               ))}
@@ -614,8 +597,7 @@ export default function Dashboard() {
             <div className="group relative rounded-2xl bg-card border border-purple-500/10 p-6 hover:border-purple-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-purple-500/10 overflow-hidden">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-500" />
               <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-150" />
-              <h3 className="text-lg font-bold mb-6 flex items-center gap-2 group-hover:text-purple-300 transition-colors"
-                style={{ fontFamily: "'Georgia', serif" }}>
+              <h3 className="text-lg font-bold mb-6 flex items-center gap-2 group-hover:text-purple-300 transition-colors" style={{ fontFamily: "serif" }}>
                 <Sparkles className="w-5 h-5 text-purple-400 animate-pulse" />
                 Как это работает
               </h3>
@@ -630,7 +612,7 @@ export default function Dashboard() {
                       {item.step}
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground" style={{ fontFamily: "'Georgia', serif" }}>{item.title}</p>
+                      <p className="font-semibold text-foreground" style={{ fontFamily: "serif" }}>{item.title}</p>
                       <p className="text-sm text-muted-foreground mt-0.5">{item.desc}</p>
                     </div>
                   </div>
@@ -641,7 +623,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* ===== МОБИЛЬНАЯ НАВИГАЦИЯ (нижняя панель) ===== */}
+      {/* Мобильная навигация */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06] bg-background/80 backdrop-blur-xl">
         <div className="grid grid-cols-4 gap-1 px-2 py-2">
           {tabs.map((tab) => (
@@ -655,7 +637,7 @@ export default function Dashboard() {
               }`}
             >
               <tab.icon className={`w-5 h-5 transition-transform duration-300 ${activeTab === tab.id ? "scale-110" : ""}`} />
-              <span className="text-[10px] font-medium" style={{ fontFamily: "'Georgia', serif" }}>
+              <span className="text-[10px] font-medium" style={{ fontFamily: "serif" }}>
                 {tab.label}
               </span>
             </button>
@@ -670,18 +652,21 @@ export default function Dashboard() {
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 opacity-[0.03]" />
             <div className="relative p-7">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>Добавить устройство</h3>
+                <h3 className="text-xl font-bold" style={{ fontFamily: "serif" }}>Добавить устройство</h3>
                 <button onClick={() => setShowAddDevice(false)} className="p-2 rounded-xl hover:bg-purple-500/10 transition-colors text-muted-foreground hover:text-foreground">
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {DEVICE_TYPES.map((device) => (
-                  <button key={device.id} onClick={() => handleAddDevice(device.id)}
-                    className="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-purple-500/10 bg-card hover:bg-purple-500/10 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden relative">
+                  <button
+                    key={device.id}
+                    onClick={() => handleAddDevice(device.id)}
+                    className="group flex flex-col items-center gap-3 p-6 rounded-2xl border border-purple-500/10 bg-card hover:bg-purple-500/10 hover:border-purple-500/40 hover:shadow-lg hover:shadow-purple-500/10 hover:-translate-y-1 transition-all duration-300 overflow-hidden relative"
+                  >
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
                     <device.icon className="w-8 h-8 text-muted-foreground group-hover:text-purple-400 transition-colors duration-300 group-hover:scale-110 transform relative z-10" />
-                    <span className="text-sm font-medium relative z-10" style={{ fontFamily: "'Georgia', serif" }}>{device.name}</span>
+                    <span className="text-sm font-medium relative z-10" style={{ fontFamily: "serif" }}>{device.name}</span>
                   </button>
                 ))}
               </div>
@@ -697,14 +682,14 @@ export default function Dashboard() {
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-600 opacity-[0.03]" />
             <div className="relative p-7">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold" style={{ fontFamily: "'Georgia', serif" }}>Пополнить баланс</h3>
+                <h3 className="text-xl font-bold" style={{ fontFamily: "serif" }}>Пополнить баланс</h3>
                 <button onClick={() => setShowTopUp(false)} className="p-2 rounded-xl hover:bg-purple-500/10 transition-colors text-muted-foreground hover:text-foreground">
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm text-muted-foreground mb-2 block" style={{ fontFamily: "'Georgia', serif" }}>Сумма (₽)</label>
+                  <label className="text-sm text-muted-foreground mb-2 block" style={{ fontFamily: "serif" }}>Сумма (₽)</label>
                   <input
                     type="number"
                     value={topUpAmount}
@@ -715,9 +700,12 @@ export default function Dashboard() {
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {[149, 399, 999].map((amount) => (
-                    <button key={amount} onClick={() => setTopUpAmount(String(amount))}
+                    <button
+                      key={amount}
+                      onClick={() => setTopUpAmount(String(amount))}
                       className={`py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${topUpAmount === String(amount) ? "bg-purple-500 text-white shadow-lg shadow-purple-500/25" : "bg-purple-500/10 text-purple-300 hover:bg-purple-500/20 border border-purple-500/20"}`}
-                      style={{ fontFamily: "'Georgia', serif" }}>
+                      style={{ fontFamily: "serif" }}
+                    >
                       {amount} ₽
                     </button>
                   ))}
