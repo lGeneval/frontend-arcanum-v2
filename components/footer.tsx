@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Apple, Monitor, Smartphone, Tv, Chrome, Terminal, Send, Mail, MessageCircle } from "lucide-react";
+import { Apple, Monitor, Smartphone, Tv, Globe, Terminal, Send, Mail, MessageCircle } from "lucide-react";
 import { AnimatedLogo } from "./animated-logo";
 
 const platforms = [
@@ -10,7 +10,7 @@ const platforms = [
   { name: "Windows", icon: Monitor, href: "#download" },
   { name: "macOS", icon: Apple, href: "#download" },
   { name: "Android TV", icon: Tv, href: "#download" },
-  { name: "Browser", icon: Chrome, href: "#download" },
+  { name: "Browser", icon: Globe, href: "#download" },
   { name: "Linux", icon: Terminal, href: "#download" },
 ];
 

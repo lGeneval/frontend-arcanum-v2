@@ -1,7 +1,7 @@
 "use client";
  
 import { useEffect, useState, useRef } from "react";
-import { Apple, Monitor, Smartphone, Tv, Chrome, Terminal, ArrowRight, Sparkles } from "lucide-react";
+import { Apple, Monitor, Smartphone, Tv, Globe, Terminal, ArrowRight, Sparkles } from "lucide-react";
 import { MagicButton } from "./magic-button";
 import Link from "next/link";
  
@@ -11,7 +11,7 @@ const platforms = [
   { name: "Windows", icon: Monitor },
   { name: "macOS", icon: Apple },
   { name: "Android TV", icon: Tv },
-  { name: "Browser", icon: Chrome },
+  { name: "Browser", icon: Globe },
   { name: "Linux", icon: Terminal },
 ];
  

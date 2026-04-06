@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js"
 import crypto from "crypto"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +13,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing telegram_id" }, { status: 400 })
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
-    // Создаём или находим пользователя
+    // Проверяем, есть ли пользователь
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id, google_id, balance")
+      .eq("telegram_id", String(telegram_id))
+      .single()
+
+    // Создаём или обновляем профиль
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .upsert(
@@ -24,7 +31,7 @@ export async function POST(request: NextRequest) {
           telegram_first_name: first_name,
           telegram_username: username,
           telegram_photo_url: photo_url,
-          balance: 0,
+          balance: existingProfile?.balance ?? 0,
         },
         { onConflict: "telegram_id" }
       )
@@ -40,16 +47,19 @@ export async function POST(request: NextRequest) {
     const token = crypto.randomBytes(32).toString("hex")
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000) // 5 минут
 
-    // Сохраняем токен в БД
+    // Сохраняем токен в БД с дополнительными данными
     await supabase.from("telegram_login_tokens").insert({
       token,
       telegram_id: String(telegram_id),
+      telegram_first_name: first_name,
+      telegram_username: username,
       expires_at: expiresAt.toISOString(),
       used: false,
     })
 
     // Возвращаем ссылку для авторизации
-    const loginUrl = `https://arcanumnox.net/auth/telegram-login?token=${token}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://arcanumnox.net"
+    const loginUrl = `${baseUrl}/auth/telegram-login?token=${token}`
 
     return NextResponse.json({ success: true, login_url: loginUrl })
   } catch (error) {
