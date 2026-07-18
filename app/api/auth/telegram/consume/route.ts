@@ -1,0 +1,5 @@
+import { createHash } from "node:crypto";
+import { NextRequest, NextResponse } from "next/server";
+import { createSession } from "@/lib/auth";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+export async function GET(request:NextRequest){const raw=request.nextUrl.searchParams.get("token");if(!raw)return NextResponse.redirect(new URL("/login?error=missing",request.url));const db=supabaseAdmin();const tokenHash=createHash("sha256").update(raw).digest("hex");const{data:login}=await db.from("telegram_login_tokens").select("id,user_id").eq("token_hash",tokenHash).is("used_at",null).gt("expires_at",new Date().toISOString()).maybeSingle();if(!login)return NextResponse.redirect(new URL("/login?error=expired",request.url));const{data:used}=await db.from("telegram_login_tokens").update({used_at:new Date().toISOString()}).eq("id",login.id).is("used_at",null).select("id").maybeSingle();if(!used)return NextResponse.redirect(new URL("/login?error=used",request.url));await createSession(login.user_id);return NextResponse.redirect(new URL("/dashboard",request.url))}
