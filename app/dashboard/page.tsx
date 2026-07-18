@@ -5,7 +5,7 @@ import { currentUser } from "@/lib/auth";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import "./dashboard.css";
 
-type User = { id: string; first_name: string | null; telegram_username: string | null; referral_code: string };
+type User = { id: string; first_name: string | null; telegram_username: string | null; email: string | null; referral_code: string };
 
 export default async function Dashboard() {
   const rawUser = await currentUser();
@@ -24,7 +24,7 @@ export default async function Dashboard() {
 
   return <main className="dashboard">
     <header><Link className="brand" href="/">ARCANUM</Link><form action="/api/auth/logout" method="post"><button className="button ghost">Выйти</button></form></header>
-    <section className="dashHero"><span>ЛИЧНЫЙ КАБИНЕТ</span><h1>Здравствуйте, {user.first_name || "пользователь"}</h1><p>{user.telegram_username ? `@${user.telegram_username}` : "Аккаунт Telegram подключён"}</p></section>
+    <section className="dashHero"><span>ЛИЧНЫЙ КАБИНЕТ</span><h1>Здравствуйте, {user.first_name || "пользователь"}</h1><p>{user.telegram_username ? `@${user.telegram_username}` : user.email || "Аккаунт Arcanum"}</p></section>
     <section className="statusGrid">
       <article className={subscription ? "statusCard active" : "statusCard"}><ShieldCheck/><div><small>ПОДПИСКА</small><h2>{plan?.name || "Не активна"}</h2><p>{expires ? <>Действует до {expires}</> : "Выберите тариф, чтобы получить доступ"}</p></div></article>
       <article className="statusCard"><Laptop/><div><small>УСТРОЙСТВА</small><h2>{devices || 0} {plural(devices || 0, "подключено", "подключены", "подключено")}</h2><p>{plan?.device_limit ? `Доступно до ${plan.device_limit}` : "Лимит появится после активации"}</p></div></article>

@@ -1,0 +1,39 @@
+.authCard .google {
+  background: #fff;
+  color: #202124;
+}
+
+.authCard .google b {
+  color: #4285f4;
+  font-size: 20px;
+}
+
+.authDivider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.authDivider::before,
+.authDivider::after {
+  content: "";
+  height: 1px;
+  background: var(--border);
+  flex: 1;
+}
+
+.authCard small {
+  color: #777181;
+  line-height: 1.5;
+}
+
+.authCard .authError {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 100, 140, 0.35);
+  border-radius: 12px;
+  background: rgba(255, 80, 120, 0.08);
+  color: #ffc2d4;
+  font-size: 14px;
+}
