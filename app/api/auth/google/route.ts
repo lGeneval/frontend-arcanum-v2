@@ -2,28 +2,39 @@ import { createHash, randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 const OAUTH_COOKIE = "arcanum_google_oauth";
-const base64url = (value: Buffer) => value.toString("base64url");
 
 export async function GET(request: NextRequest) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!supabaseUrl) return NextResponse.redirect(new URL("/login?error=google_config", request.url));
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    return NextResponse.redirect(new URL("/login?error=google_config", request.url));
+  }
 
-  const verifier = base64url(randomBytes(48));
-  const challenge = base64url(createHash("sha256").update(verifier).digest());
+  const state = randomBytes(32).toString("base64url");
+  const verifier = randomBytes(48).toString("base64url");
+  const challenge = createHash("sha256").update(verifier).digest("base64url");
   const callbackUrl = new URL("/api/auth/google/callback", request.nextUrl.origin);
-  const authorize = new URL("/auth/v1/authorize", supabaseUrl);
-  authorize.searchParams.set("provider", "google");
-  authorize.searchParams.set("redirect_to", callbackUrl.toString());
+  const authorize = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+
+  authorize.searchParams.set("client_id", clientId);
+  authorize.searchParams.set("redirect_uri", callbackUrl.toString());
+  authorize.searchParams.set("response_type", "code");
+  authorize.searchParams.set("scope", "openid email profile");
+  authorize.searchParams.set("state", state);
   authorize.searchParams.set("code_challenge", challenge);
-  authorize.searchParams.set("code_challenge_method", "s256");
+  authorize.searchParams.set("code_challenge_method", "S256");
+  authorize.searchParams.set("prompt", "select_account");
 
   const response = NextResponse.redirect(authorize);
-  response.cookies.set(OAUTH_COOKIE, verifier, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 10 * 60,
-  });
+  response.cookies.set(
+    OAUTH_COOKIE,
+    Buffer.from(JSON.stringify({ state, verifier })).toString("base64url"),
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 10 * 60,
+    },
+  );
   return response;
 }
