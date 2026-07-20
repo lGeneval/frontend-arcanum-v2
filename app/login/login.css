@@ -8,6 +8,10 @@
   font-size: 20px;
 }
 
+.authCard .apple { background:#fff;color:#08080b;border-color:#fff; }
+.authCard .apple:hover { background:#ececef; }
+.authCard .apple b { font-size:18px; }
+
 .authDivider {
   display: flex;
   align-items: center;

@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@/lib/auth";
 
 const OAUTH_COOKIE = "arcanum_google_oauth";
 
@@ -12,6 +13,8 @@ export async function GET(request: NextRequest) {
   const state = randomBytes(32).toString("base64url");
   const verifier = randomBytes(48).toString("base64url");
   const challenge = createHash("sha256").update(verifier).digest("base64url");
+  const user = await currentUser() as unknown as { id: string } | null;
+  const mode = request.nextUrl.searchParams.get("mode") === "link" && user ? "link" : "login";
   const callbackUrl = new URL("/api/auth/google/callback", request.nextUrl.origin);
   const authorize = new URL("https://accounts.google.com/o/oauth2/v2/auth");
 
@@ -27,7 +30,7 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.redirect(authorize);
   response.cookies.set(
     OAUTH_COOKIE,
-    Buffer.from(JSON.stringify({ state, verifier })).toString("base64url"),
+    Buffer.from(JSON.stringify({ state, verifier, mode })).toString("base64url"),
     {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

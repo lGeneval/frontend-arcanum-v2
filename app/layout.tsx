@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./home-overrides.css";
 
 export const metadata: Metadata = {
   title: "Arcanum — интернет без лишних границ",

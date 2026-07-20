@@ -14,5 +14,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/login", "/api/auth/google"],
+  matcher: ["/login", "/api/auth/google/:path*", "/api/auth/apple/:path*", "/api/auth/telegram/link"],
 };

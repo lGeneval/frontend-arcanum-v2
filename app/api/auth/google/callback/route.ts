@@ -1,11 +1,11 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { createSession } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { createSession, currentUser } from "@/lib/auth";
+import { attachIdentity, findOrCreateOAuthUser } from "@/lib/account-linking";
 
 const OAUTH_COOKIE = "arcanum_google_oauth";
 
-type OAuthCookie = { state?: string; verifier?: string };
+type OAuthCookie = { state?: string; verifier?: string; mode?: "login" | "link" };
 type GoogleTokenResponse = { access_token?: string };
 type GoogleProfile = {
   sub?: string;
@@ -75,17 +75,21 @@ export async function GET(request: NextRequest) {
   const profile = (await profileResponse.json()) as GoogleProfile;
   if (!profile.sub || !profile.email || profile.email_verified !== true) return failure("google_profile");
   const email = profile.email.toLowerCase();
-  const { data: user, error } = await supabaseAdmin().from("users").upsert({
-    google_id: profile.sub,
-    email,
-    first_name: profile.name || profile.given_name || email.split("@")[0],
-    avatar_url: profile.picture || null,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: "google_id" }).select("id").single();
-  if (error || !user) return failure("google_account");
+  let userId: string;
+  try {
+    const signedIn = cookie.mode === "link" ? await currentUser() as unknown as { id: string } | null : null;
+    if (cookie.mode === "link" && signedIn) {
+      await attachIdentity(signedIn.id, "google", profile.sub, { email, firstName: profile.name || profile.given_name, avatarUrl: profile.picture });
+      userId = signedIn.id;
+    } else {
+      userId = await findOrCreateOAuthUser("google", profile.sub, { email, firstName: profile.name || profile.given_name, avatarUrl: profile.picture });
+    }
+  } catch {
+    return failure("google_account");
+  }
 
-  await createSession(user.id);
-  const response = NextResponse.redirect(new URL("/dashboard", request.url));
+  await createSession(userId);
+  const response = NextResponse.redirect(new URL(cookie.mode === "link" ? "/dashboard?linked=google" : "/dashboard", request.url));
   response.cookies.delete(OAUTH_COOKIE);
   return response;
 }

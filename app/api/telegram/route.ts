@@ -2,6 +2,7 @@ import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { sendTelegramMessage } from "@/lib/telegram";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { attachIdentity } from "@/lib/account-linking";
 
 type TelegramUpdate = { message?: { text?: string; chat: { id: number }; from?: { id: number; username?: string; first_name?: string } } };
 const equal = (left: string, right: string) => { const a=Buffer.from(left),b=Buffer.from(right);return a.length===b.length&&timingSafeEqual(a,b); };
@@ -22,6 +23,10 @@ export async function POST(request: NextRequest) {
 
   const text = message.text?.trim() || "";
   const startPayload = text.startsWith("/start ") ? text.slice(7).trim() : "";
+  if (startPayload.startsWith("link_")) {
+    await linkTelegramAccount(message.chat.id, user.id, message.from, startPayload.slice(5));
+    return NextResponse.json({ ok: true });
+  }
   if (startPayload.startsWith("ref_")) await attachReferral(user.id, user.referred_by, startPayload.slice(4));
 
   if (startPayload === "login" || text === "/cabinet") await sendLogin(message.chat.id, user.id);
@@ -29,6 +34,21 @@ export async function POST(request: NextRequest) {
   else if (startPayload === "mirror" || text === "/mirror" || text === "Кабинет не работает") await sendMirrors(message.chat.id, user.id);
   else await sendMenu(message.chat.id, user.referral_code, Boolean(startPayload.startsWith("ref_")));
   return NextResponse.json({ ok: true });
+}
+
+async function linkTelegramAccount(chatId: number, telegramUserId: string, telegram: { id: number; username?: string; first_name?: string }, raw: string) {
+  const db = supabaseAdmin();
+  const tokenHash = createHash("sha256").update(raw).digest("hex");
+  const { data: link } = await db.from("telegram_link_tokens").select("id,user_id").eq("token_hash", tokenHash).is("used_at", null).gt("expires_at", new Date().toISOString()).maybeSingle();
+  if (!link) { await sendTelegramMessage(chatId, "Ссылка привязки истекла. Создайте новую в личном кабинете."); return; }
+  try {
+    await attachIdentity(link.user_id, "telegram", String(telegram.id), { firstName: telegram.first_name, telegramUsername: telegram.username || null });
+    await db.from("telegram_link_tokens").update({ used_at: new Date().toISOString() }).eq("id", link.id).is("used_at", null);
+    if (telegramUserId !== link.user_id) await db.from("sessions").delete().eq("user_id", telegramUserId);
+    await sendTelegramMessage(chatId, "✅ Telegram успешно привязан к вашему единому профилю Arcanum. Вернитесь в личный кабинет и обновите страницу.");
+  } catch {
+    await sendTelegramMessage(chatId, "Не удалось объединить профили. Обратитесь в поддержку — ваши данные не были изменены.");
+  }
 }
 
 async function attachReferral(userId: string, referredBy: string | null, code: string) {
