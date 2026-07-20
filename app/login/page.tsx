@@ -1,27 +1,10 @@
 import Link from "next/link";
+import { KeyRound, MessageCircle } from "lucide-react";
+import { Preferences } from "@/app/preferences";
+import "./login.css";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-import "./login.css";
+const errors:Record<string,string>={google_config:"Вход через Google временно недоступен.",google_expired:"Сессия входа истекла. Попробуйте ещё раз.",google_state:"Проверка безопасности не пройдена.",google_exchange:"Google не подтвердил вход.",google_profile:"Google не передал подтверждённый email.",google_account:"Не удалось открыть аккаунт Arcanum.",expired:"Ссылка Telegram истекла. Запросите новую в боте.",used:"Эта ссылка Telegram уже использована.",access_invalid:"Неверный Arcanum ID или секретная фраза.",access_locked:"Слишком много попыток. Вход временно заблокирован на 15 минут."};
 
-const errors: Record<string, string> = {
-  google_config: "Google-вход ещё не настроен на сервере.",
-  google_expired: "Сессия входа истекла. Попробуйте ещё раз.",
-  google_state: "Не удалось проверить безопасность входа. Попробуйте ещё раз.",
-  google_exchange: "Google не подтвердил вход. Попробуйте ещё раз.",
-  google_profile: "Google не передал подтверждённый email.",
-  google_account: "Не удалось создать аккаунт Arcanum.",
-  apple_config: "Вход через Apple ID пока настраивается.",
-  apple_expired: "Сессия Apple ID истекла. Попробуйте ещё раз.",
-  apple_exchange: "Apple не подтвердил вход. Попробуйте ещё раз.",
-  apple_profile: "Apple ID не передал необходимые данные.",
-  apple_account: "Не удалось открыть аккаунт Arcanum через Apple ID.",
-  expired: "Ссылка Telegram истекла. Запросите новую в боте.",
-  used: "Эта ссылка Telegram уже использована.",
-};
-
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const bot = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "arcanumvpnbot";
-  const { error } = await searchParams;
-  return <main className="authPage"><section className="authCard"><Link className="brand" href="/">ARCANUM</Link><span>ЛИЧНЫЙ КАБИНЕТ</span><h1>Войти в Arcanum</h1><p>Выберите удобный способ. Пароль создавать не нужно.</p>{error && <p className="authError">{errors[error] || "Не удалось выполнить вход. Попробуйте ещё раз."}</p>}<a className="button google" href="/api/auth/google"><b>G</b>Продолжить с Google</a><a className="button apple" href="/api/auth/apple"><b>●</b>Продолжить с Apple</a><div className="authDivider"><span>или</span></div><a className="button primary" href={`https://t.me/${bot}?start=login`}>Продолжить в Telegram</a><small>Входя, вы соглашаетесь с условиями использования и политикой конфиденциальности.</small><Link href="/">Вернуться на главную</Link></section></main>;
-}
+export default async function LoginPage({searchParams}:{searchParams:Promise<{error?:string}>}){const bot=process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME||"arcanumvpnbot";const{error}=await searchParams;return <main className="authPage"><div className="authMist"/><header className="authHeader"><Link className="brand" href="/">ARCANUM <span>NOX</span></Link><Preferences/></header><section className="authCard"><div className="sigil" aria-hidden="true"><span>✦</span></div><span className="kicker">ДОСТУП К ТАЙНОМУ</span><h1>Войти в Arcanum</h1><p>Один профиль для подписки, устройств и семьи.</p>{error&&<p className="authError">{errors[error]||"Не удалось выполнить вход."}</p>}<form className="accessForm" action="/api/auth/access" method="post"><label>Arcanum ID<input name="accessId" autoComplete="username" minLength={5} maxLength={32} pattern="[a-z0-9][a-z0-9_-]{4,31}" placeholder="ваш идентификатор" required/></label><label>Секретная фраза<input name="password" type="password" autoComplete="current-password" minLength={12} maxLength={128} placeholder="не менее 12 символов" required/></label><button className="button primary" type="submit"><KeyRound/>Войти по Arcanum ID</button></form><div className="authDivider"><span>или продолжить через</span></div><div className="providerGrid"><a className="button google" href="/api/auth/google"><b>G</b>Google</a><a className="button telegram" href={`https://t.me/${bot}?start=login`}><MessageCircle/>Telegram</a></div><small>Arcanum ID создаётся в личном кабинете после первого входа через Telegram или Google.</small><Link className="backLink" href="/">Вернуться на главную</Link></section></main>}

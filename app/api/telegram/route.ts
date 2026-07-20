@@ -10,11 +10,12 @@ const botName = () => process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME || "arcanumv
 const siteUrl = () => process.env.NEXT_PUBLIC_SITE_URL || "https://arcanumnox.net";
 
 export async function POST(request: NextRequest) {
+  if (Number(request.headers.get("content-length") || 0) > 256_000) return NextResponse.json({ ok:false },{ status:413 });
   const expected = process.env.TELEGRAM_WEBHOOK_SECRET || "";
   const actual = request.headers.get("x-telegram-bot-api-secret-token") || "";
   if (!expected || !equal(actual, expected)) return NextResponse.json({ ok: false }, { status: 401 });
 
-  const update = await request.json() as TelegramUpdate;
+  let update:TelegramUpdate;try{update=await request.json() as TelegramUpdate}catch{return NextResponse.json({ok:false},{status:400})}
   const message = update.message;
   if (!message?.from) return NextResponse.json({ ok: true });
   const db = supabaseAdmin();
@@ -31,6 +32,8 @@ export async function POST(request: NextRequest) {
 
   if (startPayload === "login" || text === "/cabinet") await sendLogin(message.chat.id, user.id);
   else if (startPayload === "help" || text === "/help" || text === "Помощь") await sendHelp(message.chat.id);
+  else if (startPayload === "connect" || text === "/connect") await sendConnect(message.chat.id);
+  else if (startPayload === "plans" || text === "/plans") await sendPlans(message.chat.id);
   else if (startPayload === "mirror" || text === "/mirror" || text === "Кабинет не работает") await sendMirrors(message.chat.id, user.id);
   else await sendMenu(message.chat.id, user.referral_code, Boolean(startPayload.startsWith("ref_")));
   return NextResponse.json({ ok: true });
@@ -68,10 +71,12 @@ async function sendLogin(chatId: number, userId: string) {
 
 async function sendMenu(chatId: number, referralCode: string, referred: boolean) {
   const prefix = referred ? "Вы перешли по приглашению друга. Добро пожаловать!\n\n" : "";
-  await sendTelegramMessage(chatId, `${prefix}<b>Arcanum</b>\n\nУправляйте подпиской, устройствами и семейной группой в личном кабинете.`, { inline_keyboard: [[{ text: "Личный кабинет", url: `https://t.me/${botName()}?start=login` }], [{ text: "Пригласить друга", switch_inline_query: `Попробуй Arcanum: https://t.me/${botName()}?start=ref_${referralCode}` }], [{ text: "Помощь", url: `https://t.me/${botName()}?start=help` }]] });
+  await sendTelegramMessage(chatId, `${prefix}<b>ARCANUM · тайное становится доступным</b>\n\nУправляйте подпиской, устройствами и семейной группой в защищённом личном кабинете.`, { inline_keyboard: [[{ text: "◈ Личный кабинет", url: `https://t.me/${botName()}?start=login` }],[{text:"Тарифы",url:`https://t.me/${botName()}?start=plans`},{text:"Подключение",url:`https://t.me/${botName()}?start=connect`}],[{ text: "Пригласить друга", switch_inline_query: `Попробуй Arcanum: https://t.me/${botName()}?start=ref_${referralCode}` }], [{ text: "Помощь", url: `https://t.me/${botName()}?start=help` }]] });
 }
 
 async function sendHelp(chatId: number) { await sendTelegramMessage(chatId, "<b>Помощь Arcanum</b>\n\n1. Откройте личный кабинет.\n2. Активируйте тариф.\n3. Выберите своё устройство и следуйте инструкции.\n\nЖивая поддержка будет подключена перед запуском оплат."); }
+async function sendPlans(chatId:number){await sendTelegramMessage(chatId,"<b>Тарифы Arcanum</b>\n\nМобильный — 199 ₽/месяц · 2 устройства\nЛичный — 299 ₽/месяц · 5 устройств\nСемейный — 449 ₽/месяц · 5 участников и 15 устройств\n\nОплата появится после подключения платёжного провайдера.",{inline_keyboard:[[{text:"Открыть тарифы",url:`${siteUrl()}/#plans`}],[{text:"Вернуться в меню",url:`https://t.me/${botName()}`}]]})}
+async function sendConnect(chatId:number){await sendTelegramMessage(chatId,"<b>Подключение Arcanum</b>\n\nПосле активации подписки в кабинете появится персональный ключ и инструкции для iOS, Android, Windows, macOS, Linux, ТВ и роутеров. Никому не передавайте ключ доступа.",{inline_keyboard:[[{text:"Открыть кабинет",url:`https://t.me/${botName()}?start=login`}],[{text:"Нужна помощь",url:`https://t.me/${botName()}?start=help`}]]})}
 
 async function sendMirrors(chatId: number, userId: string) {
   const mirrors = [siteUrl(), ...(process.env.SITE_MIRRORS || "").split(",")].map(x=>x.trim()).filter(Boolean);
